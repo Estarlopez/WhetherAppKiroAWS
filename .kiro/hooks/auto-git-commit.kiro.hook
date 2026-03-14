@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "name": "Auto Git Commit",
+  "description": "Automatically stages new files and commits changes to existing files in the current git repository branch whenever files are created or modified.",
+  "version": "1",
+  "when": {
+    "type": "userTriggered",
+    "patterns": [
+      "**/*"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Files have been created or modified in the workspace. Your job is to stage and commit these changes to the current git branch. Follow these steps:\n1. Run `git status` to see what files are new or modified.\n2. Run `git add <file>` for each new or modified file (or `git add .` if appropriate).\n3. Run `git commit -m \"<message>\"` with a short, descriptive commit message that summarizes the changes.\nDo not push. Do not switch branches. Just stage and commit the changes on the current branch."
+  }
+}
