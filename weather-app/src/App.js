@@ -1,6 +1,18 @@
 import { useState } from 'react';
 import './App.css';
 
+// Format a date as "Wednesday, Mar 14"
+function formatDate(date) {
+  return date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+}
+
+// Get today + offset days date label
+function getForecastDate(offsetDays) {
+  const d = new Date();
+  d.setDate(d.getDate() + offsetDays);
+  return formatDate(d);
+}
+
 // Geocode a city name using Nominatim (no CORS issues, no API key required)
 async function geocodeCity(cityName) {
   let res;
@@ -74,6 +86,7 @@ function App() {
       const currentPeriod = periods[0];
       setCurrent({
         location: `${location.city}, ${location.state}`,
+        date: formatDate(new Date()),
         temperature: currentPeriod.temperature,
         temperatureUnit: currentPeriod.temperatureUnit,
         shortForecast: currentPeriod.shortForecast,
@@ -85,7 +98,7 @@ function App() {
 
       // 5-day forecast: next 5 daytime periods
       const daytime = periods.filter((p) => p.isDaytime).slice(0, 5);
-      setForecast(daytime);
+      setForecast(daytime.map((p, i) => ({ ...p, date: getForecastDate(i) })));
     } catch (err) {
       setError(err.message || 'Network error. Please check your connection and try again.');
     } finally {
@@ -103,7 +116,7 @@ function App() {
 
   return (
     <div className="app">
-      <h1>Weather App</h1>
+      <h1>☁️ Sky Report</h1>
 
       <form className="search-form" onSubmit={handleSearch}>
         <input
@@ -148,6 +161,7 @@ function App() {
             />
             <div className="current-details">
               <p className="location">{current.location}</p>
+              <p className="current-date">{current.date}</p>
               <p className="temperature">{current.temperature}°{current.temperatureUnit}</p>
               <p className="description">{current.shortForecast}</p>
               <p>Humidity: {current.humidity}%</p>
@@ -164,6 +178,7 @@ function App() {
             <thead>
               <tr>
                 <th>Day</th>
+                <th>Date</th>
                 <th>Conditions</th>
                 <th>Temp (°F)</th>
                 <th>Forecast</th>
@@ -173,6 +188,7 @@ function App() {
               {forecast.map((period) => (
                 <tr key={period.name}>
                   <td>{period.name}</td>
+                  <td className="forecast-date">{period.date}</td>
                   <td>
                     <img
                       src={period.icon}
